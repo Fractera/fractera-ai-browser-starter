@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 
 const basePath = process.env.IS_DEMO === "1" ? "/demo" : "";
@@ -40,6 +41,9 @@ const nextConfig: NextConfig = {
   },
   poweredByHeader: false,
   reactCompiler: true,
+  // 🔒 КОРЕНЬ TURBOPACK — ПАПКА СЛУЖБЫ (196-2). Без него Next выводил корнем `/opt/fractera` (несколько lockfile рядом), и
+  // соседние папки машины попадали в обход трассировщика.
+  turbopack: { root: path.resolve(".") },
 };
 
 // 🪦 ОБЁРТКА `withBotId` УБРАНА 2026-09-06 ВМЕСТЕ С ПАКЕТОМ `botid`. Это
