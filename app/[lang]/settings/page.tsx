@@ -10,6 +10,7 @@ import { WorkspaceShell } from "@/components/workspace/workspace-shell";
 import { PassportBody } from "./_components/passport-body.client";
 import { ApiDoc } from "./_components/api-doc";
 import { ApiKeyCard } from "./_components/api-key.client";
+import { ReadTestBench } from "./_components/read-test.client";
 import { SettingsCard } from "./_components/settings-card";
 import { browserUi } from "./_i18n/browser.i18n";
 import { passportOutline } from "./_lib/passport-outline";
@@ -98,6 +99,8 @@ async function BrowserSettingsBody({ params, searchParams }: Props) {
               ))}
 
             {active === "api" && <ApiDoc base={publicMemoryUrl(host, proto)} keyWords={ui.apiKey} lang={lang} />}
+
+            {active === "read-test" && <ReadTestBench words={ui.readTest} />}
 
             {active === "settings" && (
               <SettingsCard icon={<KeyRound className="size-4 text-muted-foreground" />} open title={ui.apiKey.title}>

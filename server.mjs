@@ -16,7 +16,7 @@ import next from "next"
 import { contract, CONTRACT_VERSION, SERVICE } from "./contract.mjs"
 import { keyMatches } from "./lib/api-key.mjs"
 import { bootEngine, engineState, endpoint } from "./lib/engine.mjs"
-import { readPage } from "./lib/browser.mjs"
+import { LIMITS, readPages } from "./lib/browser.mjs"
 
 const PORT = Number(process.env.PORT ?? 3800)
 const HOST = process.env.AI_BROWSER_HOST ?? "127.0.0.1"
@@ -101,13 +101,16 @@ const server = createServer(async (req, res) => {
   if (req.method === "POST" && path === "/v1/read") {
     const body = await readBody(req)
     if (!body) return send(res, 400, { error: "bad-json", ok: false })
-    const urls = Array.isArray(body.urls) ? body.urls.filter((u) => typeof u === "string" && u.trim()) : []
+    const urls = Array.isArray(body.urls) ? body.urls.filter((u) => typeof u === "string" && u.trim()).map((u) => u.trim()) : []
     if (!urls.length) return send(res, 400, { error: "no-urls", ok: false })
-    // 🔒 196-2: ровно одна ссылка. Несколько — 196-3; молча взять первую значило бы потерять остальные.
-    if (urls.length > 1) return send(res, 400, { error: "too-many-urls", limit: 1, ok: false })
+    // 🔒 196-3: ПРЕДЕЛ ОТКАЗЫВАЕТ ЦЕЛИКОМ И НАЗЫВАЕТ ЧИСЛО. Молча взять первые десять значило бы потерять остальные так,
+    // что зовущий об этом не узнал бы.
+    if (urls.length > LIMITS.urls) return send(res, 400, { error: "too-many-urls", limit: LIMITS.urls, ok: false })
     if (!endpoint()) return send(res, 503, { engine: engineState().status, error: "engine-unreachable", ok: false })
-    const result = await readPage(urls[0].trim())
-    return send(res, 200, { ok: !result.error, results: [result] })
+    const results = await readPages(urls)
+    // 🔒 `ok` — ВЫЗОВ ОБРАБОТАН; ОТКАЗ ОДНОЙ ССЫЛКИ — ЕЁ ПОЛЕ `error`, А СЧЁТ — `failed`. Иначе одна битая ссылка из десяти
+    // объявляла бы неудачей девять открытых.
+    return send(res, 200, { failed: results.filter((r) => r.error).length, limits: LIMITS, ok: true, results })
   }
 
   return send(res, 404, { error: "not-built", ok: false })
