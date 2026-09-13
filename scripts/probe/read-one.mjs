@@ -54,7 +54,11 @@ const r2 = await read([URL_STATIC, URL_SPA])
 say(r2.status === 400 && r2.j.error === "too-many-urls", `две ссылки в 196-2 → ${r2.status} ${r2.j.error}`)
 
 const raw = await (await fetch(URL_STATIC)).text()
-const rawTitle = (raw.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? "").trim()
+// 🔒 СЫРОЙ `<title>` РАСКОДИРУЕТСЯ: в HTML знак «&» лежит сущностью `&amp;`, а браузер отдаёт сам знак. ✗ Первый прогон
+// 196-2 сравнивал «Self-Hosted & Token-Free» с «Self-Hosted &amp; Token-Free» и объявил отказом совпадающие заголовки.
+const decode = (s) =>
+  s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+const rawTitle = decode((raw.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? "").trim())
 const r3 = await read([URL_STATIC])
 const p = r3.j.results?.[0] ?? {}
 say(r3.status === 200 && r3.j.ok === true && p.status === 200, `страница: ${r3.status} за ${p.ms} мс, код страницы ${p.status}${p.error ? " " + p.error + " " + p.why : ""}`)
