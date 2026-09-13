@@ -54,31 +54,15 @@ import { type NextRequest, NextResponse } from "next/server";
 // ✗ В памяти это уже оплачено дважды: петля на кнопке «Войти» (180) и день
 // отладки терминала у чата (157-3).
 const SELF_GUARDED = new Set([
-  "/api/fractera/bench-cases",
-  "/api/fractera/graph-search",
-  "/api/fractera/models",
-  "/api/fractera/graph-test",
-  "/api/fractera/vector-search",
-  "/api/fractera/vector-test",
   // 🔒 ТРИ ДВЕРИ ОБЪЕКТНОГО ХРАНИЛИЩА (192-1) — того же класса: сами зовут
   // `benchGuard`, и их имена стоят здесь до первой сборки, а не после отладки.
-  "/api/fractera/object-test",
   // 🔒 ДВЕРЬ «ПОЛУЧИТЬ ОПИСАНИЕ» (194-2) — тот же `benchGuard`, имя стоит до первой сборки.
   // Набор сверяется ТОЧНЫМ именем: соседнее `/object-test` вложенный путь не открывает.
-  "/api/fractera/object-test/describe",
   // 🔒 ДВЕРЬ ФАЙЛА ОБЪЕКТА (194-5) — `benchGuard`; перехваченная привратником, отдала бы HTML входа
   // вместо картинки, и превью молча показало бы битое изображение.
-  "/api/fractera/object-file",
-  "/api/fractera/object-search",
-  "/api/fractera/object-open",
   // 🔒 ДВЕРЬ ПРИЁМА ОБЪЕКТА (194-15) — `benchGuard`; в неё проводит договор `/v1/keep_object`. Имя стоит до
   // первой сборки: перехваченная привратником, она ответила бы страницей входа, и договор отдал бы её наружу.
-  "/api/fractera/object-ingest",
-  "/api/fractera/memory-test",
   "/api/me",
-  "/api/fractera/pty-ticket",
-  "/api/fractera/openai-key",
-  "/api/fractera/anthropic-key",
 ]);
 
 /**

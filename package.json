@@ -1,26 +1,24 @@
 {
-  "name": "fractera-memory-starter",
-  "version": "1.0.0",
+  "name": "fractera-ai-browser-starter",
+  "version": "0.1.0",
   "private": true,
-  "description": "Служба памяти Fractera: чёрный ящик со своим договором, своим портом и своей жизнью",
+  "description": "Служба ИИ-браузера Fractera: браузер Camoufox за своим договором, своим портом и своим сайтом — копия оболочки службы памяти",
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
     "build": "next build",
     "dev": "next dev",
     "check": "node scripts/check-contract.mjs",
-    "probe": "node scripts/probe/alive.mjs"
+    "install:engine": "bash scripts/install.sh"
   },
   "dependencies": {
-    "@xterm/addon-fit": "^0.11.0",
-    "@xterm/xterm": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cn": "^0.2.6",
     "lucide-react": "^0.446.0",
     "next": "16.2.10",
     "next-themes": "^0.3.0",
-    "node-pty": "^1.1.0",
+    "playwright-core": "1.62.0",
     "radix-ui": "^1.6.1",
     "react": "19.2.7",
     "react-dom": "19.2.7",
@@ -31,7 +29,6 @@
     "tailwindcss-animate": "^1.0.7",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0",
-    "ws": "^8.21.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -52,7 +49,6 @@
   "license": "MIT",
   "pnpm": {
     "onlyBuiltDependencies": [
-      "node-pty",
       "sharp"
     ]
   },

@@ -102,7 +102,7 @@ export function publicAdminUrl(host: string, proto: string): string {
  * локальный.
  */
 export function publicMemoryUrl(host: string, proto: string): string {
-  if (!host) return "http://127.0.0.1:3700";
+  if (!host) return "http://127.0.0.1:3800";
   return `${proto}://${host}`;
 }
 
