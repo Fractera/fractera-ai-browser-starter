@@ -88,6 +88,7 @@ for (const [name, p] of [["витрина", st], ["SPA", spa], ["википед�
     `${name}: код ${p?.status}, «${p?.title}», html ${p?.html_length}, текст ${p?.text_length}, заголовков ${n("headings")}, ссылок ${n("links")}, кнопок ${n("buttons")}, форм ${n("forms")}, полей ${n("fields")}, картинок ${n("images")}, видео ${n("videos")}, фреймов ${n("iframes")}, мета ${Object.keys(p?.meta ?? {}).length}, отвергнуто ${p?.blocked?.total}, ${p?.ms} мс${p?.error ? " " + p.error + " " + p.why : ""}`,
   )
 }
+for (const p of [st, spa, med]) if (p?.error) console.log(`  · ${p.url}: незавершённые запросы ${JSON.stringify(p.pending)}`)
 say(st?.title === rawTitle, `заголовок браузера = заголовку простого запроса: «${st?.title}» / «${rawTitle}»`)
 say((spa?.html_length ?? 0) > rawSpa.length * 2 && (spa?.fields?.total ?? 0) > 0, `SPA: исходный ${rawSpa.length} → итоговый ${spa?.html_length}; поле ввода: ${JSON.stringify(spa?.fields?.items?.[0])}`)
 say((med?.images?.total ?? 0) > 0 && Boolean(med?.images?.items?.[0]?.src), `медиа по атрибутам: ${JSON.stringify(med?.images?.items?.find((i) => i.alt) ?? med?.images?.items?.[0])}`)
@@ -111,7 +112,7 @@ for (const [i, u] of forbidden.entries()) {
 const page = `<!doctype html><title>trap</title><p id="o">start</p>
 <img src="http://127.0.0.1:${PORT}/img"><iframe src="http://127.0.0.1:${PORT}/frame"></iframe>
 <script>
-fetch("http://127.0.0.1:${PORT}/fetch").then(() => { o.textContent = "LEAK-FETCH" }).catch(() => { o.textContent = "fetch-blocked" });
+fetch("http://127.0.0.1:${PORT}/fetch").then((r) => { o.textContent = r.status === 403 ? "fetch-blocked" : "LEAK-FETCH" }).catch(() => { o.textContent = "fetch-blocked" });
 try { const w = new WebSocket("ws://127.0.0.1:${PORT}/ws"); w.onopen = () => { document.title = "LEAK-WS" } } catch (e) {}
 fetch("http://httpbin.org/get").then((r) => r.json()).then(() => { document.body.insertAdjacentHTML("beforeend", "<p>external-ok</p>") }).catch(() => {});
 </script>`
