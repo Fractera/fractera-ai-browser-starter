@@ -22,7 +22,8 @@ export const METHODS = [
       },
     ],
     returns:
-      "results — по одному на адрес, в том же порядке: url, final_url, status, title, html (+ html_length, html_truncated), " +
+      "results — по одному на адрес, в том же порядке: url, final_url, status, title, load_reached (дождалась ли страница " +
+      "события load; false — отдано то, что успело отрисоваться), html (+ html_length, html_truncated), " +
       "text (+ text_length, text_truncated), lang, canonical, meta, headings, links, buttons, forms, fields, images, videos, " +
       "audios, iframes (у каждого списка items и total), blocked (запросы страницы, отвергнутые запретом адресов), ms; " +
       "failed — сколько ссылок не открылось; limits — пределы службы.",
