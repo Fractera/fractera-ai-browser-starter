@@ -21,14 +21,14 @@ export type WelcomeUi = {
 const DICT: Record<string, WelcomeUi> = {
   en: {
     title: "Sign in to start",
-    lead: "The memory bench and the journal of its work are available after you sign in.",
+    lead: "The read test bench and the access key of the AI browser are available after you sign in.",
     action: "Sign in or sign up",
     home: "Back to the home page",
     unavailable: "The sign-in service address is not configured yet.",
   },
   ru: {
     title: "Авторизуйтесь, чтобы начать",
-    lead: "Стенд памяти и журнал её работы доступны после входа в проект.",
+    lead: "Стенд «Тест чтения» и ключ доступа ИИ-браузера доступны после входа в проект.",
     action: "Войти или зарегистрироваться",
     home: "Вернуться на главную",
     unavailable: "Адрес службы входа пока не настроен.",

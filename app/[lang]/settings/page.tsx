@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { Suspense } from "react";
 import { headers } from "next/headers";
 import { KeyRound } from "lucide-react";
-import { publicMemoryUrl } from "@/lib/fractera/auth-url";
+import { publicServiceUrl } from "@/lib/fractera/auth-url";
 import { PageCrumbs } from "@/components/nav/page-crumbs.server";
 import { Eyebrow, H1, Lead } from "@/components/ui/typography";
 import { WorkspaceShell } from "@/components/workspace/workspace-shell";
@@ -98,7 +98,7 @@ async function BrowserSettingsBody({ params, searchParams }: Props) {
                 <p className="text-[length:var(--fs-small)] text-muted-foreground">{ui.passportMissing}</p>
               ))}
 
-            {active === "api" && <ApiDoc base={publicMemoryUrl(host, proto)} keyWords={ui.apiKey} lang={lang} />}
+            {active === "api" && <ApiDoc base={publicServiceUrl(host, proto)} keyWords={ui.apiKey} lang={lang} />}
 
             {active === "read-test" && <ReadTestBench words={ui.readTest} />}
 

@@ -7,12 +7,12 @@ import "./globals.css";
 import { chatLang } from "@/lib/fractera/i18n";
 
 export const metadata: Metadata = {
-  description: "Автономная память для ИИ-агентов на вашем сервере.",
+  description: "Настоящий браузер для ИИ-агентов и служб на вашем сервере.",
   // 🪦 ЗДЕСЬ СТОЯЛ `https://chat.vercel.ai` — ХВОСТ ВЕНДОРЕННОГО ЧАТА, и это
   // был настоящий дефект поиска: каждый относительный адрес в мете уводил на
   // чужой домен. Базы здесь больше нет вовсе: страницы объявляют её сами, от
   // хоста запроса (`lib/seo.ts`), потому что у каждого экземпляра он свой.
-  title: "Fractera Memory",
+  title: "Fractera AI Browser",
 };
 
 export const viewport = {

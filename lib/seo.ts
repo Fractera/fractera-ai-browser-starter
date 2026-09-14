@@ -42,7 +42,7 @@ export async function origin(): Promise<string> {
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "";
   const proto = h.get("x-forwarded-proto") ?? "https";
-  return host ? `${proto}://${host}` : "http://127.0.0.1:3700";
+  return host ? `${proto}://${host}` : "http://127.0.0.1:3800";
 }
 
 /** Канонический адрес страницы языка. */
@@ -89,7 +89,7 @@ export function softwareSchema({
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     applicationCategory: "DeveloperApplication",
-    applicationSubCategory: "AI memory engine",
+    applicationSubCategory: "AI web browser for agents",
     description,
     inLanguage: lang,
     isAccessibleForFree: true,

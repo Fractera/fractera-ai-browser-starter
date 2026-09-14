@@ -60,6 +60,8 @@ const SELF_GUARDED = new Set([
   "/api/me",
   // 🔒 ДВЕРЬ СТЕНДА ЧТЕНИЯ (196-3) — ТОГО ЖЕ КЛАССА: сама зовёт `fracteraSession()`, и имя стоит здесь до первой сборки.
   "/api/fractera/read-test",
+  // 🔒 ДВЕРЬ КЛЮЧА (196-5, прежнее имя `memory-key`) — того же класса: проверяет роль сама.
+  "/api/fractera/ai-browser-key",
 ]);
 
 /**

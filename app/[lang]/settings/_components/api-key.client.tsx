@@ -43,7 +43,7 @@ export function ApiKeyCard({ words }: { words: ApiKeyWords }) {
     let alive = true;
     void (async () => {
       try {
-        const r = await fetch("/api/fractera/memory-key", { cache: "no-store" });
+        const r = await fetch("/api/fractera/ai-browser-key", { cache: "no-store" });
         const data = (await r.json()) as { exists?: boolean; masked?: string | null };
         if (!alive) return;
         setExists(Boolean(data?.exists));
@@ -63,7 +63,7 @@ export function ApiKeyCard({ words }: { words: ApiKeyWords }) {
     setBusy(true);
     setTrouble(null);
     try {
-      const r = await fetch("/api/fractera/memory-key", { cache: "no-store", method: "POST" });
+      const r = await fetch("/api/fractera/ai-browser-key", { cache: "no-store", method: "POST" });
       const data = (await r.json()) as { key?: string; masked?: string; ok?: boolean; why?: string };
       // 🛑 ЧИТАЕМ ТЕЛО, А НЕ КОД: дверь отвечает 200 с ok:false там, где отказ
       // понятен ей самой.

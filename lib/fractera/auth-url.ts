@@ -101,7 +101,8 @@ export function publicAdminUrl(host: string, proto: string): string {
  * снаружи её и правда нет. Обещать адрес, которого нет, хуже, чем показать
  * локальный.
  */
-export function publicMemoryUrl(host: string, proto: string): string {
+// 🪦 196-5: называлась `publicMemoryUrl` — имя унаследовано копией службы памяти; адрес тот же, служба другая.
+export function publicServiceUrl(host: string, proto: string): string {
   if (!host) return "http://127.0.0.1:3800";
   return `${proto}://${host}`;
 }

@@ -61,7 +61,7 @@ export async function generateMetadata({
     openGraph: {
       description: w.seo.description,
       locale: lang,
-      siteName: "Fractera Memory",
+      siteName: "Fractera AI Browser",
       title: w.seo.title,
       type: "website",
       url,
@@ -80,15 +80,15 @@ export async function generateMetadata({
 // 🔒 ПРАВИЛО ШИРЕ СЛУЧАЯ: приём, скопированный с соседней страницы, приносит с
 // собой и условие, при котором сосед его применяет. У настроек тело уже под
 // Suspense, поэтому там это незаметно.
-export default function MemoryHome(props: { params: Promise<{ lang: string }> }) {
+export default function ServiceHome(props: { params: Promise<{ lang: string }> }) {
   return (
     <Suspense fallback={<div className="min-h-screen bg-background" />}>
-      <MemoryHomeBody {...props} />
+      <ServiceHomeBody {...props} />
     </Suspense>
   );
 }
 
-async function MemoryHomeBody({ params }: { params: Promise<{ lang: string }> }) {
+async function ServiceHomeBody({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const base = await origin();
   return <Landing base={base} lang={lang} />;
