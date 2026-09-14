@@ -2,47 +2,30 @@ import { Suspense } from "react";
 import { headers } from "next/headers";
 import { shellUi } from "./shell.i18n";
 import { ThemeToggle } from "./theme-toggle.client";
-import { publicChatUrl } from "@/lib/fractera/auth-url";
+import { FRACTERA_SERVICES, serviceUrl, servicesUi } from "./services";
 
-// ПОДВАЛ СЛУЖБЫ — ВЕРХНИЙ БЛОК СО ССЫЛКАМИ И СТРОКА КОПИРАЙТА.
+// ПОДВАЛ СЛУЖБЫ — ВЕРХНИЙ БЛОК СО ССЫЛКАМИ НА ВСЕ СЛУЖБЫ FRACTERA И СТРОКА КОПИРАЙТА.
 //
-// 🎯 РЕШЕНИЕ ВЛАДЕЛЬЦА 2026-09-11: «на двух страницах, которые мы сделали —
-// страница чата и страница памяти, — верни второй верхний блок футера для
-// страниц архитектора. И разместить там две ссылки, пока только перелинковкой
-// друг на друга; больше добавлять ссылок не нужно».
+// 🎯 СЛОВО ВЛАДЕЛЬЦА 2026-09-14 (шаг 197): «типовой фут который должен перекрёстный ссылаться во все эти страницы» — чат,
+// память, ИИ-браузер. 🪦 Прежняя редакция (186-4, слово 2026-09-11) держала одну ссылку на соседа.
 //
-// 🪦 ЭТОТ БЛОК СНИМАЛИ 2026-09-06 ЦЕЛИКОМ, И ТОГДА ЭТО БЫЛО ВЕРНО: прежний
-// подвал на 481 строку читал `APP-CONFIG` и `PLATFORM-CONFIG` порта 3000 —
-// меню групп, соцсети, ссылки в панель. Сотри владелец 3000, и подвал повёл бы
-// в никуда. Теперь блок вернулся БЕЗ единого чужого конфига: в нём ровно одна
-// ссылка, и её адрес выводится из хоста запроса.
-//
-// 🔒 ССЫЛКА ОДНА НА СЛУЖБУ, И ЭТО ЧИСЛО, А НЕ НЕДОДЕЛКА. Две службы, по ссылке
-// на каждой — это и есть перелинковка, о которой шла речь. Третью сюда
-// добавлять нельзя, пока её не назовут: подвал, растущий сам по себе, через
-// месяц снова станет меню на 481 строку.
-//
-// 🛑 АДРЕС СОСЕДА ВЫВОДИТСЯ ИЗ ХОСТА, А НЕ ПИШЕТСЯ КОНСТАНТОЙ. На домене это
-// `chat.<апекс>`, на голом IP — соседний порт. Константа увела бы
-// человека с его сервера на наш, и он бы этого не заметил.
-//
-// 🛑 ЗАГОЛОВКИ ЧИТАЮТСЯ ПОД `<Suspense>`: под `cacheComponents` обращение к
-// запросу вне границы ожидания роняет пререндер. В этом проекте закон оплачен
-// сборкой трижды за один день — здесь он применён заранее.
-//
-// 🛑 ГОД БЕРЁТСЯ ИЗ `new Date()`, и лечение стоит в `app/[lang]/layout.tsx`:
-// адаптер `connection()` перед вызовом. Здесь оно НЕ повторяется — две защиты
-// от одной беды означают два места, где её чинят.
+// 🔒 ФАЙЛ БАЙТ В БАЙТ ОДИН В ТРЁХ РЕПОЗИТОРИЯХ, вместе с `services.ts` — список и слова живут там.
+// 🔒 ТЕКУЩАЯ СЛУЖБА ПОКАЗАНА, НО НЕ ССЫЛКОЙ: подвал одинаков везде, а ссылка на страницу, где человек уже стоит, — пустой
+// ход. Своя служба узнаётся сравнением выведенного адреса с адресом запроса, а не константой в файле: иначе три копии
+// перестали бы быть одним файлом.
+// 🔒 В ПОДВАЛЕ НЕТ ЧУЖИХ КОНФИГОВ (закон 137): адреса выводятся из хоста запроса.
+// 🛑 ЗАГОЛОВКИ ЧИТАЮТСЯ ПОД `<Suspense>`: под `cacheComponents` обращение к запросу вне границы ожидания роняет пререндер.
+// 🛑 ГОД БЕРЁТСЯ ИЗ `new Date()`, и лечение стоит в `app/[lang]/layout.tsx` (`connection()` перед вызовом).
 
 export function SiteFooter({ lang }: { lang: string }) {
   const ui = shellUi(lang);
 
   return (
     <footer className="w-full border-border border-t">
-      {/* ВЕРХНИЙ БЛОК: соседние службы одной строкой. */}
+      {/* ВЕРХНИЙ БЛОК: все службы Fractera одной строкой. */}
       <div className="w-full border-border border-b px-6 py-4 md:px-8">
         <Suspense fallback={<div className="h-5" />}>
-          <SiblingLink lang={lang} />
+          <ServiceLinks lang={lang} />
         </Suspense>
       </div>
 
@@ -58,29 +41,34 @@ export function SiteFooter({ lang }: { lang: string }) {
   );
 }
 
-/**
- * Ссылка на соседнюю службу.
- *
- * 🛑 ПУСТОЙ АДРЕС — ЗАКОННЫЙ ИСХОД, И ТОГДА ССЫЛКИ НЕТ ВОВСЕ. Машина без домена
- * и без порта соседа сосчитать его не может; ссылка в никуда хуже её отсутствия.
- */
-async function SiblingLink({ lang }: { lang: string }) {
+/** Ссылки на службы. Служба, чей адрес не выводится из хоста, не показывается вовсе: ссылка в никуда хуже её отсутствия. */
+async function ServiceLinks({ lang }: { lang: string }) {
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "";
   const proto = h.get("x-forwarded-proto") ?? "https";
-  const ui = shellUi(lang);
-  const href = publicChatUrl(host, proto);
+  const ui = servicesUi(lang);
+  const own = host ? `${proto}://${host}` : "";
+  const links = FRACTERA_SERVICES.map((s) => ({ href: serviceUrl(s, host, proto), id: s.id })).filter((l) => l.href);
 
-  if (!href) return <div className="h-5" />;
+  if (!links.length) return <div className="h-5" />;
 
   return (
-    <nav aria-label="Fractera" className="flex flex-wrap items-center gap-4">
-      <a
-        className="text-[length:var(--fs-small)] text-muted-foreground hover:text-foreground"
-        href={`${href}/${lang}`}
-      >
-        {ui.chatService}
-      </a>
+    <nav aria-label={ui.label} className="flex flex-wrap items-center gap-4">
+      {links.map((l) =>
+        l.href === own ? (
+          <span aria-current="page" className="text-[length:var(--fs-small)] font-medium text-foreground" key={l.id}>
+            {ui.names[l.id]}
+          </span>
+        ) : (
+          <a
+            className="text-[length:var(--fs-small)] text-muted-foreground hover:text-foreground"
+            href={`${l.href}/${lang}`}
+            key={l.id}
+          >
+            {ui.names[l.id]}
+          </a>
+        ),
+      )}
     </nav>
   );
 }
