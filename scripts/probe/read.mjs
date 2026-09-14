@@ -117,17 +117,33 @@ fetch("http://httpbin.org/get").then((r) => r.json()).then(() => { document.body
 </script>`
 const b64 = Buffer.from(page).toString("base64").replace(/\+/g, "-").replace(/\//g, "_")
 const redirect = `http://httpbin.org/redirect-to?url=${encodeURIComponent(`http://127.0.0.1:${PORT}/redirect`)}`
-const t = await read([`http://httpbin.org/base64/${b64}`, redirect])
+// 🔒 КАЖДЫЙ СЛУЧАЙ — СВОИМ ВЫЗОВОМ И СО СВОИМ СЧЁТОМ ОБРАЩЕНИЙ: ✗ первый прогон 196-3 слил ловушку и перенаправление в один
+// вызов, и одно обращение к слушателю нельзя было приписать ни одному из двух без рассуждения.
+const brief = (r) => JSON.stringify({ blocked: r.blocked, error: r.error, final_url: r.final_url, ms: r.ms, status: r.status, title: r.title, why: r.why })
+
+const plain = await read(["http://httpbin.org/html"])
+const pl = plain.j.results?.[0] ?? {}
+say(!pl.error && (pl.text_length ?? 0) > 1000, `контроль: обычная страница по http через прокси: код ${pl.status}, текст ${pl.text_length}, ${pl.ms} мс${pl.error ? " " + pl.error + " " + pl.why : ""}`)
+
+hits.length = 0
+const rdAns = await read([redirect])
+await wait(1500)
+const rd = rdAns.j.results?.[0] ?? {}
+say(rd.error === "url-forbidden", `перенаправление httpbin → петля: ${rd.error} (${rd.why}), ${rd.ms} мс`)
+say(hits.length === 0, `после перенаправления слушатель получил обращений: ${hits.length}${hits.length ? " — " + hits.join(", ") : ""}`)
+if (rd.error !== "url-forbidden") console.log(`  · ответ: ${brief(rd)}`)
+
+hits.length = 0
+const t = await read([`http://httpbin.org/base64/${b64}`])
 await wait(1500)
 const tp = t.j.results?.[0] ?? {}
-const rd = t.j.results?.[1] ?? {}
-say(!tp.error && tp.title === "trap", `страница-ловушка открыта: «${tp.title}», код ${tp.status}${tp.error ? " " + tp.error + " " + tp.why : ""}`)
+say(!tp.error && tp.title === "trap", `страница-ловушка открыта: «${tp.title}», код ${tp.status}, ${tp.ms} мс${tp.error ? " " + tp.error + " " + tp.why : ""}`)
+if (tp.error) console.log(`  · ответ: ${brief(tp)}`)
 say(/fetch-blocked/.test(tp.text ?? ""), `скрипт страницы увидел отказ: «${String(tp.text ?? "").replace(/\s+/g, " ").slice(0, 80)}»`)
-const kinds = (tp.blocked?.items ?? []).map((x) => `${x.type} ${new URL(x.url).pathname}`)
-say(["/img", "/frame", "/fetch"].every((p) => kinds.some((k) => k.endsWith(p))), `наш перехват отверг: ${kinds.join(" · ")} (всего ${tp.blocked?.total})`)
-console.log(`  · сокет: ${kinds.some((k) => k.endsWith("/ws")) ? "отвергнут перехватом" : "перехватом не замечен"}; внешний запрос страницы: ${/external-ok/.test(tp.text ?? "") ? "прошёл" : "не дошёл"}`)
-say(rd.error === "url-forbidden", `перенаправление httpbin → петля: ${rd.error} (${rd.why})`)
-say(hits.length === 0, `слушатель на петле получил обращений: ${hits.length}${hits.length ? " — " + hits.join(", ") : ""}`)
+const kinds = (tp.blocked?.items ?? []).map((x) => `${x.type} ${x.url}`)
+say(["/img", "/frame", "/fetch"].every((p) => kinds.some((k) => k.includes(`:${PORT}${p}`))), `запрет отверг: ${kinds.join(" · ")} (всего ${tp.blocked?.total})`)
+console.log(`  · сокет: ${kinds.some((k) => k.includes("/ws") || k.startsWith("proxy-connect")) ? "отвергнут" : "не замечен"}; внешний запрос страницы: ${/external-ok/.test(tp.text ?? "") ? "прошёл" : "не дошёл"}`)
+say(hits.length === 0, `после ловушки слушатель получил обращений: ${hits.length}${hits.length ? " — " + hits.join(", ") : ""}`)
 
 // ── B: пределы и замок ─────────────────────────────────────────────────────────────────────────────────────────────
 const many = await read(Array.from({ length: 11 }, (_, i) => `https://example.com/?${i}`))
