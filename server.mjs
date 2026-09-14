@@ -126,7 +126,7 @@ const server = createServer(async (req, res) => {
     const result = await readYouTube(url, lang)
     // 🔒 НЕТ СУБТИТРОВ — УСПЕХ С `transcript: null` И `why`; НЕТ РОЛИКА ИЛИ СТРАНИЦЫ — ОТКАЗ С КОДОМ. Пустой успех на
     // несуществующий ролик читался бы как «ролик есть, просто молчит».
-    const status = !result.error ? 200 : ["url-forbidden", "url-invalid"].includes(result.error) ? 400 : ["video-unavailable", "consent-wall", "no-player-data"].includes(result.error) ? 422 : 502
+    const status = !result.error ? 200 : ["url-forbidden", "url-invalid"].includes(result.error) ? 400 : ["video-unavailable", "youtube-bot-check", "consent-wall", "no-player-data"].includes(result.error) ? 422 : 502
     return send(res, status, { ok: !result.error, ...result })
   }
 

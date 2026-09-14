@@ -50,14 +50,16 @@ const other = (a.j.tracks ?? []).find((t) => t.lang && t.lang !== tr?.lang && t.
 if (other) {
   const b = await yt({ lang: other.lang, url: "https://youtu.be/dQw4w9WgXcQ" })
   say(b.j.id === "dQw4w9WgXcQ", `youtu.be → id ${b.j.id}`)
-  say(b.j.transcript?.lang === other.lang || Boolean(b.j.why), `язык «${other.lang}»: получен «${b.j.transcript?.lang}», строк ${b.j.transcript?.lines?.length}; why: ${b.j.why}`)
+  // 🔒 ЯЗЫК — СПРАВКА, А НЕ ПРОВЕРКА: он не назван доказательством в ТЗ 196-4, а первая редакция засчитывала любой `why`
+  // как успех — то есть «язык не получен» проходил зелёным. Теперь печатается, что вышло на самом деле.
+  console.log(`  · язык «${other.lang}»: ${b.j.transcript?.lang === other.lang ? "получен" : "НЕ получен"} (транскрипт «${b.j.transcript?.lang}», строк ${b.j.transcript?.lines?.length ?? 0}); why: ${b.j.why}`)
 }
 
 // ── B: ролик без субтитров — «что досталось + причина» ─────────────────────────────────────────────────────────────
 let noCap = null
 for (const id of NO_CAPTION_CANDIDATES) {
   const r = await yt({ url: `https://www.youtube.com/watch?v=${id}` })
-  console.log(`  · кандидат ${id}: ${r.status}, дорожек ${r.j.tracks?.length ?? "—"}, ${r.ms} мс${r.j.error ? " " + r.j.error : ""}`)
+  console.log(`  · кандидат ${id}: ${r.status}, дорожек ${r.j.tracks?.length ?? "—"}, ${r.ms} мс${r.j.error ? ` ${r.j.error} (${r.j.playability?.status}: ${r.j.why})` : ""}`)
   if (r.status === 200 && r.j.tracks?.length === 0) {
     noCap = r
     break

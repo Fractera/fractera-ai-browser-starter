@@ -46,7 +46,8 @@ export const METHODS = [
       "или null, why — словами, чего не досталось и почему, blocked, ms.",
     onMiss:
       "Не адрес ролика — 400 not-youtube. Субтитров нет или плеер их не отдал — 200, transcript: null и why (данные ролика " +
-      "отдаются). Ролика нет — 422 video-unavailable с причиной YouTube; страница согласия — 422 consent-wall; страница не " +
+      "отдаются). Ролика нет — 422 video-unavailable с причиной YouTube; YouTube потребовал подтвердить, что зовущий не бот, — " +
+      "422 youtube-bot-check (ролик есть, адрес сервера под проверкой); страница согласия — 422 consent-wall; страница не " +
       "открылась — 502 page-failed. Движок не поднят — 503 engine-unreachable.",
   },
 ]

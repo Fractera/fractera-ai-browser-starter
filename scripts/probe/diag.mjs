@@ -25,5 +25,7 @@ for (const url of process.argv.slice(2)) {
     console.log(`  page_url ${p.trace.page_url}`)
     for (const q of p.trace.requests) console.log(`  req ${q.state} ${q.ms}ms ${q.type} ${q.url}${q.failure ? " ✗ " + q.failure : ""}`)
     for (const e of p.trace.egress) console.log(`  egress ${e.kind} ${e.ms}ms ${e.target} → ${e.outcome}`)
+    for (const r of p.trace.route ?? []) console.log(`  route ${r.decision} decide=${r.ms}ms sent=${r.sent_ms ?? "—"}ms ${r.url}${r.error ? " ✗ " + r.error : ""}`)
+    if (!(p.trace.route ?? []).length) console.log("  route: перехват не вызывался ни разу")
   }
 }
