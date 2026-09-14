@@ -16,7 +16,7 @@ import next from "next"
 import { contract, CONTRACT_VERSION, SERVICE } from "./contract.mjs"
 import { keyMatches } from "./lib/api-key.mjs"
 import { bootEngine, engineState, endpoint } from "./lib/engine.mjs"
-import { LIMITS, readPages } from "./lib/browser.mjs"
+import { LIMITS, MODES, readPages } from "./lib/browser.mjs"
 import { readYouTube, youtubeId } from "./lib/youtube.mjs"
 
 const PORT = Number(process.env.PORT ?? 3800)
@@ -89,7 +89,7 @@ const server = createServer(async (req, res) => {
   if (req.method === "GET" && path === "/v1/health") {
     const e = engineState()
     return send(res, 200, {
-      engine: { lastError: e.lastError, restarts: e.restarts, startedAt: e.startedAt, status: e.status },
+      engine: { lastError: e.lastError, modes: MODES, restarts: e.restarts, startedAt: e.startedAt, status: e.status },
       ok: true,
       service: SERVICE,
       startedAt: STARTED_AT,
