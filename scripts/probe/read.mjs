@@ -18,7 +18,9 @@ import { readFileSync } from "node:fs"
 import { createServer } from "node:http"
 
 const BASE = process.env.AI_BROWSER_URL ?? "http://127.0.0.1:3800"
-const URL_STATIC = "https://www.fractera.ai/"
+// 🛑 НЕ БОЕВОЙ САЙТ ВЛАДЕЛЬЦА: десятки загрузок витрины `www.fractera.ai` с адреса сервера включили защиту Vercel —
+// прогон 196-3 получил «Vercel Security Checkpoint» 403. Эталон статической страницы — нейтральный MDN.
+const URL_STATIC = "https://developer.mozilla.org/en-US/docs/Web/HTML"
 const URL_SPA = "https://todomvc.com/examples/react/dist/"
 const URL_MEDIA = "https://en.wikipedia.org/wiki/Web_browser"
 
@@ -88,7 +90,13 @@ for (const [name, p] of [["витрина", st], ["SPA", spa], ["википед�
     `${name}: код ${p?.status}, «${p?.title}», html ${p?.html_length}, текст ${p?.text_length}, заголовков ${n("headings")}, ссылок ${n("links")}, кнопок ${n("buttons")}, форм ${n("forms")}, полей ${n("fields")}, картинок ${n("images")}, видео ${n("videos")}, фреймов ${n("iframes")}, мета ${Object.keys(p?.meta ?? {}).length}, отвергнуто ${p?.blocked?.total}, ${p?.ms} мс${p?.error ? " " + p.error + " " + p.why : ""}`,
   )
 }
-for (const p of [st, spa, med]) if (p?.error) console.log(`  · ${p.url}: незавершённые запросы ${JSON.stringify(p.pending)}`)
+const showTrace = (p) => {
+  if (!p?.trace) return
+  console.log(`  · трасса ${p.url}: страница ${p.trace.page_url}`)
+  for (const q of p.trace.requests) console.log(`    req ${q.state} ${q.ms}ms ${q.type} ${q.url}${q.failure ? " ✗ " + q.failure : ""}`)
+  for (const e of p.trace.egress) console.log(`    egress ${e.kind} ${e.ms}ms ${e.target} → ${e.outcome}`)
+}
+for (const p of [st, spa, med]) showTrace(p)
 say(st?.title === rawTitle, `заголовок браузера = заголовку простого запроса: «${st?.title}» / «${rawTitle}»`)
 say((spa?.html_length ?? 0) > rawSpa.length * 2 && (spa?.fields?.total ?? 0) > 0, `SPA: исходный ${rawSpa.length} → итоговый ${spa?.html_length}; поле ввода: ${JSON.stringify(spa?.fields?.items?.[0])}`)
 say((med?.images?.total ?? 0) > 0 && Boolean(med?.images?.items?.[0]?.src), `медиа по атрибутам: ${JSON.stringify(med?.images?.items?.find((i) => i.alt) ?? med?.images?.items?.[0])}`)
@@ -125,6 +133,7 @@ const brief = (r) => JSON.stringify({ blocked: r.blocked, error: r.error, final_
 const plain = await read(["http://httpbin.org/html"])
 const pl = plain.j.results?.[0] ?? {}
 say(!pl.error && (pl.text_length ?? 0) > 1000, `контроль: обычная страница по http через прокси: код ${pl.status}, текст ${pl.text_length}, ${pl.ms} мс${pl.error ? " " + pl.error + " " + pl.why : ""}`)
+showTrace(pl)
 
 hits.length = 0
 const rdAns = await read([redirect])
