@@ -98,7 +98,7 @@ const EN: LandingWords = {
         q: "What if a YouTube video has no subtitles?",
       },
       {
-        a: "A light page opens in a few seconds; a heavy one with dozens of third-party resources takes 20–60 s. Up to 10 addresses per call, 3 open at once, 90 s per address. Measured on the reference server: three heavy pages in one call — about 95 s.",
+        a: "A light page opens in a few seconds; a heavy one with dozens of third-party resources takes 20–60 s. Up to 10 addresses per call, opened strictly one after another — the server has one browser, and it works with one page at a time for every caller; 90 s per address once its turn comes.",
         q: "How fast is it?",
       },
       {
@@ -147,7 +147,7 @@ const EN: LandingWords = {
     lead: "Limits are stated in the answer itself, and anything cut is marked — a list of 300 links out of 2,000 carries total: 2000.",
     rows: [
       { value: "10", what: "Addresses per call" },
-      { value: "3", what: "Tabs open at once" },
+      { value: "1 — strictly in turn", what: "Pages open at once" },
       { value: "90 s", what: "Time per address" },
       { value: "5,000,000 characters", what: "Final HTML per page" },
       { value: "1,000,000 characters", what: "Visible text per page" },
@@ -261,7 +261,7 @@ const RU: LandingWords = {
         q: "А если у ролика YouTube нет субтитров?",
       },
       {
-        a: "Лёгкая страница открывается за несколько секунд, тяжёлая с десятками сторонних ресурсов — за 20–60 с. До 10 адресов за вызов, одновременно 3, на адрес 90 с. Измерено на эталонном сервере: три тяжёлые страницы одним вызовом — около 95 с.",
+        a: "Лёгкая страница открывается за несколько секунд, тяжёлая с десятками сторонних ресурсов — за 20–60 с. До 10 адресов за вызов, открываются строго по очереди — у сервера один браузер, и он работает с одной страницей за раз для всех зовущих; на адрес 90 с, когда подошла его очередь.",
         q: "Насколько это быстро?",
       },
       {
@@ -310,7 +310,7 @@ const RU: LandingWords = {
     lead: "Пределы названы в самом ответе, а обрезанное помечено: список из 300 ссылок при 2 000 на странице несёт total: 2000.",
     rows: [
       { value: "10", what: "Адресов за вызов" },
-      { value: "3", what: "Вкладок одновременно" },
+      { value: "1 — строго по очереди", what: "Страниц одновременно" },
       { value: "90 с", what: "Время на адрес" },
       { value: "5 000 000 знаков", what: "Итоговый HTML страницы" },
       { value: "1 000 000 знаков", what: "Видимый текст страницы" },

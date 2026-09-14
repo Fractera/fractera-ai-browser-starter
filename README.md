@@ -130,7 +130,7 @@ GET /v1/contract   the machine-readable contract
 | What | Limit |
 |---|---|
 | Addresses per call | 10 |
-| Tabs open at once | 3 |
+| Pages open at once | 1 — strictly in turn, one queue for every caller |
 | Time per address | 90 s |
 | Final HTML per page | 5,000,000 characters |
 | Visible text per page | 1,000,000 characters |

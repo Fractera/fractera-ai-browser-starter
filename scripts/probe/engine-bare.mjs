@@ -100,7 +100,8 @@ let lightFailed = 0
 let streak = 0
 for (let round = 1; round <= ROUNDS; round++) {
   const t0 = Date.now()
-  const heavy = await Promise.all(HEAVY.map(open))
+  // SEQUENTIAL=1 — строго по одной странице (решение владельца 2026-09-14); иначе три разом, как в первом опыте.
+  const heavy = process.env.SEQUENTIAL === "1" ? await (async () => { const out = []; for (const u of HEAVY) out.push(await open(u)); return out })() : await Promise.all(HEAVY.map(open))
   const light = []
   let roundHangs = 0
   for (const u of LIGHT) {

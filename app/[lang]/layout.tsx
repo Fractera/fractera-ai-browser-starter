@@ -2,6 +2,8 @@ import { connection } from "next/server";
 import { type ReactNode, Suspense } from "react";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
+import { BusyBanner } from "@/components/shell/busy-banner.client";
+import { shellUi } from "@/components/shell/shell.i18n";
 import { buildDesignCss } from "@/lib/design-css";
 
 // РАСКЛАДКА ЯЗЫКОВОГО СЕГМЕНТА СЛУЖБЫ БОТА (137-3, 2026-09-06).
@@ -74,6 +76,9 @@ export default async function BotLangLayout({
 
       <div className="flex min-h-screen flex-col">
         <SiteHeader lang={lang} />
+        {/* 🔒 КРАСНАЯ ПОЛОСА ПОД ШАПКОЙ, ПОКА БРАУЗЕР РАБОТАЕТ (196-8, слово владельца «as red notification»).
+            Слова отдаются островку поимённо, а не словарём целиком. */}
+        <BusyBanner words={{ busy: shellUi(lang).busy, down: shellUi(lang).engineDown }} />
         {children}
         {/* Подвал ждёт запроса из-за года копирайта — см. адаптер выше.
             Заглушка держит высоту, чтобы страница не прыгала при подстановке. */}

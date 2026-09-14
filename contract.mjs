@@ -25,7 +25,8 @@ export const METHODS = [
       "results — по одному на адрес, в том же порядке: url, final_url, status, title, load_reached (дождалась ли страница " +
       "события load; false — отдано то, что успело отрисоваться), html (+ html_length, html_truncated), " +
       "text (+ text_length, text_truncated), lang, canonical, meta, headings, links, buttons, forms, fields, images, videos, " +
-      "audios, iframes (у каждого списка items и total), blocked (запросы страницы, отвергнутые запретом адресов), ms; " +
+      "audios, iframes (у каждого списка items и total), blocked (запросы страницы, отвергнутые запретом адресов), ms, " +
+      "queued_ms (сколько ссылка ждала очереди: браузер открывает строго одну страницу за раз для всех зовущих); " +
       "failed — сколько ссылок не открылось; limits — пределы службы.",
     onMiss:
       "Движок браузера не поднят — 503 engine-unreachable сразу. Ссылок больше предела — 400 too-many-urls с limit. " +
