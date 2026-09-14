@@ -30,7 +30,8 @@ export const METHODS = [
       "failed — сколько ссылок не открылось; limits — пределы службы.",
     onMiss:
       "Движок браузера не поднят — 503 engine-unreachable сразу. Ссылок больше предела — 400 too-many-urls с limit. " +
-      "Отказ по одной ссылке не роняет остальные: у неё поле error — url-invalid, url-forbidden, page-failed, page-timeout — и why.",
+      "Отказ по одной ссылке не роняет остальные: у неё поле error — url-invalid, url-forbidden, page-failed, page-timeout — и why. " +
+      "Движок браузера завис — engine-hung: служба сама перезапускает движок, следующая ссылка открывается после его подъёма.",
   },
   {
     name: "youtube",

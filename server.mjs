@@ -89,7 +89,16 @@ const server = createServer(async (req, res) => {
   if (req.method === "GET" && path === "/v1/health") {
     const e = engineState()
     return send(res, 200, {
-      engine: { lastError: e.lastError, modes: MODES, queue: queueState(), restarts: e.restarts, startedAt: e.startedAt, status: e.status },
+      engine: {
+        hangs: e.hangs,
+        lastError: e.lastError,
+        lastRecovery: e.lastRecovery,
+        modes: MODES,
+        queue: queueState(),
+        restarts: e.restarts,
+        startedAt: e.startedAt,
+        status: e.status,
+      },
       ok: true,
       service: SERVICE,
       startedAt: STARTED_AT,
