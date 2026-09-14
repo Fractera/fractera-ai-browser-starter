@@ -4,7 +4,7 @@
 // агента порождается из ответа по HTTP. Тот же закон, что у договора памяти.
 
 export const SERVICE = "fractera-ai-browser"
-export const CONTRACT_VERSION = "0.2.0"
+export const CONTRACT_VERSION = "0.3.0"
 
 export const METHODS = [
   {
@@ -30,6 +30,24 @@ export const METHODS = [
     onMiss:
       "Движок браузера не поднят — 503 engine-unreachable сразу. Ссылок больше предела — 400 too-many-urls с limit. " +
       "Отказ по одной ссылке не роняет остальные: у неё поле error — url-invalid, url-forbidden, page-failed, page-timeout — и why.",
+  },
+  {
+    name: "youtube",
+    about:
+      "Открыть ролик YouTube настоящим браузером и вернуть его данные (название, описание, канал, длительность, даты, просмотры) " +
+      "и субтитры строками с метками времени [мм:сс–мм:сс]. Звать, когда нужно содержание ролика, а не страница вокруг него.",
+    params: [
+      { name: "url", type: "string", required: true, about: "Адрес ролика: youtube.com/watch?v=…, youtu.be/…, /shorts/…, /embed/…" },
+      { name: "lang", type: "string", required: false, about: "Желаемый язык субтитров (en, ru…). Не назван — язык, который выбрал плеер" },
+    ],
+    returns:
+      "id, video (id, title, description, channel, channel_id, length_seconds, publish_date, upload_date, view_count, keywords, " +
+      "is_live), playability, tracks (lang, kind: manual|asr, name), transcript (lang, kind, lines [start, end, text в мс], text) " +
+      "или null, why — словами, чего не досталось и почему, blocked, ms.",
+    onMiss:
+      "Не адрес ролика — 400 not-youtube. Субтитров нет или плеер их не отдал — 200, transcript: null и why (данные ролика " +
+      "отдаются). Ролика нет — 422 video-unavailable с причиной YouTube; страница согласия — 422 consent-wall; страница не " +
+      "открылась — 502 page-failed. Движок не поднят — 503 engine-unreachable.",
   },
 ]
 

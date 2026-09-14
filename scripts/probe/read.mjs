@@ -57,7 +57,7 @@ for (let i = 0; i < 60; i++) {
   await wait(2000)
 }
 const c = await (await fetch(`${BASE}/v1/contract`, { headers: { "x-data-secret": SECRET } })).json().catch(() => ({}))
-say(c.version === "0.2.0" && c.methods?.[0]?.name === "read", `договор ${c.version}, методы: ${(c.methods ?? []).map((m) => m.name).join(", ")}`)
+say(/^0\.([2-9]|\d{2,})\./.test(c.version ?? "") && c.methods?.[0]?.name === "read", `договор ${c.version}, методы: ${(c.methods ?? []).map((m) => m.name).join(", ")}`)
 
 // ── слушатель на петле: он и есть «слой данных», до которого страница не должна достать ─────────────────────────────
 const hits = []

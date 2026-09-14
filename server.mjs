@@ -17,6 +17,7 @@ import { contract, CONTRACT_VERSION, SERVICE } from "./contract.mjs"
 import { keyMatches } from "./lib/api-key.mjs"
 import { bootEngine, engineState, endpoint } from "./lib/engine.mjs"
 import { LIMITS, readPages } from "./lib/browser.mjs"
+import { readYouTube, youtubeId } from "./lib/youtube.mjs"
 
 const PORT = Number(process.env.PORT ?? 3800)
 const HOST = process.env.AI_BROWSER_HOST ?? "127.0.0.1"
@@ -111,6 +112,22 @@ const server = createServer(async (req, res) => {
     // 🔒 `ok` — ВЫЗОВ ОБРАБОТАН; ОТКАЗ ОДНОЙ ССЫЛКИ — ЕЁ ПОЛЕ `error`, А СЧЁТ — `failed`. Иначе одна битая ссылка из десяти
     // объявляла бы неудачей девять открытых.
     return send(res, 200, { failed: results.filter((r) => r.error).length, limits: LIMITS, ok: true, results })
+  }
+
+  if (req.method === "POST" && path === "/v1/youtube") {
+    const body = await readBody(req)
+    if (!body) return send(res, 400, { error: "bad-json", ok: false })
+    const url = typeof body.url === "string" ? body.url.trim() : ""
+    if (!url) return send(res, 400, { error: "no-url", ok: false })
+    // 🔒 196-4: НЕ-YOUTUBE ОТКАЗЫВАЕТ ДО БРАУЗЕРА — метод говорит, чем он не является, а не открывает что попало.
+    if (!youtubeId(url)) return send(res, 400, { error: "not-youtube", ok: false, url })
+    if (!endpoint()) return send(res, 503, { engine: engineState().status, error: "engine-unreachable", ok: false })
+    const lang = typeof body.lang === "string" && /^[a-zA-Z-]{2,12}$/.test(body.lang) ? body.lang : undefined
+    const result = await readYouTube(url, lang)
+    // 🔒 НЕТ СУБТИТРОВ — УСПЕХ С `transcript: null` И `why`; НЕТ РОЛИКА ИЛИ СТРАНИЦЫ — ОТКАЗ С КОДОМ. Пустой успех на
+    // несуществующий ролик читался бы как «ролик есть, просто молчит».
+    const status = !result.error ? 200 : ["url-forbidden", "url-invalid"].includes(result.error) ? 400 : ["video-unavailable", "consent-wall", "no-player-data"].includes(result.error) ? 422 : 502
+    return send(res, status, { ok: !result.error, ...result })
   }
 
   return send(res, 404, { error: "not-built", ok: false })
